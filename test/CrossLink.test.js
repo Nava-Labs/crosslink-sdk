@@ -1,30 +1,46 @@
 const assert = require('assert');
 const CrossLink = require('../src/CrossLink')
+const MarketplaceMockABI = require('./mock/MarketplaceMockABI.json')
 const { createWalletClient, custom, http } = require('viem');
 const { privateKeyToAccount } = require('viem/accounts');
-const { polygonMumbai } = require('viem/chains');
+const { polygonMumbai, mainnet, avalancheFuji } = require('viem/chains');
 require('dotenv').config()
 
 
 describe('CrossLink SDK', function () {
-  let crosslink;
+  let crosslink, account, client;
+  const FROM = 'polygon-testnet'
+  const TO = 'bsc-testnet'
   before(async function (){
-    const account = privateKeyToAccount(process.env.PK) 
-    const client = createWalletClient({
+    account = privateKeyToAccount(process.env.PK) 
+    walletAccount = createWalletClient({
       chain: polygonMumbai,
       account,
       transport: http() //harusnya pake custom(window.ethereum)
     })
-    // console.log("wallet client ", client)
-    let crosslink = new CrossLink(client);
-    console.log( "Awawawa ", await crosslink.fetchBestRoutes('op-testnet', 'polygon-testnet') )
+    crosslink = new CrossLink(walletAccount);
   })
+  
+  it('should able to get best routes', async function () {
+    let bestRoutes = await crosslink.fetchBestRoutes(FROM, TO);
+    bestRoutes = bestRoutes.data;
+    assert.equal(bestRoutes[0].slug, FROM, "source is not right")
+    assert.equal(bestRoutes[bestRoutes.length-1].slug, TO, "destination is not right")
+  });
 
-  it('should complete this test', function (done) {
-    console.log("yoo")
-    return new Promise(function (resolve) {
-      assert.ok(true);
-      resolve();
-    }).then(done);
+  it('should able to hop and execute based on route', async function () {
+    this.timeout(5000)
+    let sourceDetails = {
+      contractAddr: "0xd563E792dC7799ec0839209B2485F2492d3257bc",
+      contractABI: MarketplaceMockABI,
+      functionName: "buy",
+      args: [
+        "0xeD7B73A82dB4D2406c0a25c55122fc317f2e6Afd", //tokenAddr
+        "1" //tokenId
+      ]
+    }
+    let hash = await crosslink.hopThenExecute(FROM, TO, sourceDetails);
+
+    assert.equal(hash.length, 66, "transaction failed")
   });
 })
