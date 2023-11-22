@@ -30,16 +30,16 @@ describe('CrossLink SDK', function () {
 
   it('should able to hop and execute based on route', async function () {
     this.timeout(5000)
-    let sourceDetails = {
+    let contractDetails = {
       contractAddr: "0xd563E792dC7799ec0839209B2485F2492d3257bc",
       contractABI: MarketplaceMockABI,
       functionName: "buy",
-      args: [
+      destinationArgs: [
         "0xeD7B73A82dB4D2406c0a25c55122fc317f2e6Afd", //tokenAddr
         "1" //tokenId
       ]
     }
-    let hash = await crosslink.hopThenExecute(FROM, TO, sourceDetails);
+    let hash = await crosslink.hopThenExecute(FROM, TO, contractDetails);
 
     assert.equal(hash.length, 66, "transaction failed")
   });

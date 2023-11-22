@@ -34,7 +34,7 @@ class CrossLink {
             argsChainSelectors.push(BigInt(bestRoutes[i].chainSelector));
         }
 
-        let newArgs = [argsChainSelectors, ...sourceDetails.args];
+        let newArgs = [argsChainSelectors, ...sourceDetails.destinationArgs];
         let details = {
             address: sourceDetails.contractAddr,
             abi: sourceDetails.contractABI,
@@ -42,9 +42,6 @@ class CrossLink {
             args: newArgs,
             account: this.walletClient.account
         }
-        console.log("new argss ", newArgs)
-        console.log("details ", details)
-        // console.log("clientt ", this.client)
         try{
             let {request}  = await this.client.simulateContract(details)
             return request;
@@ -52,22 +49,6 @@ class CrossLink {
             throw new Error(`Error while simulate the contract: ${error}`);
         }
     }
-
-    // source
-    // contactAddr: ,
-    // contactABI: ,
-    // functionName: ,
-    // args: [],
-    // value
-
-    //op: 
-    //polygon : 
-    //marketplaceAddr: 
-    //marketplaceABI:
-    //args: 
-    //- id: 
-    //- tokenAddr: 
-    //value
 
     async hopThenExecute(source, destination, sourceDetails) {
         let bestRoutes;
@@ -89,8 +70,6 @@ class CrossLink {
 
 
     }
-
-    // Additional methods...
 }
 
 module.exports = CrossLink;
