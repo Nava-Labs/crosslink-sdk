@@ -1,9 +1,9 @@
 // src/index.js
 
 // Import the main SDK class
-const CrossLink = require('./src/CrossLink');
+const OpenCCIP = require('./src/OpenCCIP');
 
 // Export the SDK class
 module.exports = {
-    CrossLink
+    OpenCCIP
 };
