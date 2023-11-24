@@ -1,6 +1,6 @@
-# CrossLink SDK README
+# OpenCCIP SDK README
 
-The CrossLink SDK is a powerful tool for developers to implement multichain transactions with multihop features supported by Chainlink CCIP. It is also compatible with Viem Wallet.
+The OpenCCIP SDK is a powerful tool for developers to implement multichain transactions with multihop features supported by Chainlink CCIP. It is also compatible with Viem Wallet.
 
 ## Table of Contents
 
@@ -16,13 +16,13 @@ The CrossLink SDK is a powerful tool for developers to implement multichain tran
 
 ## Installation
 
-To get started with the CrossLink SDK, you can install it via npm:
+To get started with the OpenCCIP SDK, you can install it via npm:
 
 `
-npm install crosslink-sdk
+npm install openccip-sdk
 `
 or
-`yarn add crosslink-sdk
+`yarn add openccip-sdk
 `
 
 ### Functions
@@ -45,7 +45,7 @@ const sourceDetails = {
 2. fetchBestRoutes(FROM, TO)
 This function retrieves the best possible routes for a transaction.
 ```
-const bestRoutes = await crosslink.fetchBestRoutes(FROM, TO);
+const bestRoutes = await openccip.fetchBestRoutes(FROM, TO);
 ```
 
 #### Source and Destination Chain Identifiers
@@ -63,32 +63,33 @@ The source and destination variables are used to specify the source and destinat
 Follow this example to use the SDK
 
 ```
-const CrossLink = require('crosslink-sdk');
+const OpenCCIP = require('openccip-sdk');
 const { createWalletClient, http } = require('viem');
 const { privateKeyToAccount } = require('viem/accounts');
-const { polygonMumbai } = require('viem/chains');
+const { baseGoerli } = require('viem/chains');
 
 const account = privateKeyToAccount(process.env.PK); // Replace with your private key
 const walletAccount = createWalletClient({
-  chain: polygonMumbai, // Replace with your desired chain configuration
+  chain: baseGoerli, // Replace with your desired chain configuration
   account,
   transport: http(),
 });
-const crosslink = new CrossLink(walletAccount);
-const sourceDetails = {
-  contractAddr: "0xF52907fC5b46788CEb25C9b3051e818a88a6Dce4",
-  contractABI: MarketplaceMockABI,
-  functionName: "buy",
-  args: [
-    "0xeD7B73A82dB4D2406c0a25c55122fc317f2e6Afd", // tokenAddr
-    "1" // tokenId
-  ]
-};
-const FROM = 'polygon-testnet';
-const TO = 'bsc-testnet';
-const hash = await crosslink.hopThenExecute(FROM, TO, sourceDetails);
+const openccip = new OpenCCIP(walletAccount);
+let contractDetails = {
+      contractAddr: "0x84335647DB15CeBe5b313b6D3D883b13652115f2",
+      contractABI: MarketplaceMockABI,
+      functionName: "buy",
+      args: [
+        1,
+        "0xeD7B73A82dB4D2406c0a25c55122fc317f2e6Afd", //tokenAddr
+        "1" //tokenId
+      ]
+    }
+const FROM = 'base-testnet';
+const TO = 'polygon-testnet';
+const txHash = await openccip.hopThenExecute(FROM, TO, sourceDetails);
 ```
 
 ## Contributing
-Contributions to the CrossLink SDK are welcome. If you find any issues or have suggestions for improvements, please open an issue or create a pull request on the GitHub repository.
+Contributions to the OpenCCIP SDK are welcome. If you find any issues or have suggestions for improvements, please open an issue or create a pull request on the GitHub repository.
 
