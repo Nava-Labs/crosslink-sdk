@@ -9,7 +9,7 @@ The OpenCCIP SDK is a powerful tool for developers to implement multichain trans
 - [SDK Functions](#sdk-functions)
   - [1. `hopThenExecute`](#1-hopthenexecute)
   - [2. `fetchBestRoutes`](#2-fetchBestRoutes)
-  - [2. `getAllSyncTimestamps`](#2-getAllSyncTimetamps)
+  - [3. `getAllSyncTimestamps`](#3-getAllSyncTimetamps)
 - [Example](#example)
 - [Contributing](#contributing)
 
