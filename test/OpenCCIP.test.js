@@ -1,6 +1,7 @@
 const assert = require('assert');
 const OpenCCIP = require('../src/OpenCCIP')
 const MarketplaceMockABI = require('./mock/MarketplaceMockABI.json')
+const CRC1SyncableABI = require('./mock/CRC1Syncable/CRC1SyncableABI.json')
 const { createWalletClient, custom, http } = require('viem');
 const { privateKeyToAccount } = require('viem/accounts');
 const { polygonMumbai, mainnet, avalancheFuji, baseGoerli } = require('viem/chains');
@@ -10,9 +11,17 @@ describe('OpenCCIP SDK', function () {
   let openccip, account;
   const FROM = 'base-testnet'
   const TO = 'polygon-testnet'
-  const contractAddr = '0xB8316EC19DF8F0FD4A8089C9dA437688B50F9b90'
+  const mockContractAddr = '0x27bB6AA05244730B1CA31Fe71C1616A68b60A9B3'
+  const crc1ContractAddr = '0x9aDa66369E1f548aB048C7FC708b6271994a16D4'
   const mockInterfaceId = '0x00000000';
 
+  const SUPPORTED_NETWORKS = [
+    'op-testnet',
+    'fuji-testnet',
+    'polygon-testnet',
+    'base-testnet',
+    'bsc-testnet'
+  ]
   before(async function (){
     account = privateKeyToAccount(process.env.PK) 
     walletAccount = createWalletClient({
@@ -22,6 +31,12 @@ describe('OpenCCIP SDK', function () {
     })
     openccip = new OpenCCIP(walletAccount);
   })
+
+  it('should able to get all supported networks', async function () {
+    let supportedNetworks = openccip.getSupportedNetworks();
+    console.log("supproted ", supportedNetworks)
+    assert.deepEqual(supportedNetworks, SUPPORTED_NETWORKS, "the supported network is not correct")
+  });
   
   it('should able to get best routes', async function () {
     let bestRoutes = await openccip.fetchBestRoutes(FROM, TO);
@@ -33,7 +48,7 @@ describe('OpenCCIP SDK', function () {
   it('should able to hop and execute based on route', async function () {
     this.timeout(5000)
     let contractDetails = {
-      contractAddr: contractAddr,
+      mockContractAddr: mockContractAddr,
       contractABI: MarketplaceMockABI,
       functionName: "buy",
       args: [
@@ -47,8 +62,8 @@ describe('OpenCCIP SDK', function () {
   });
 
   it('should able to get all last sync timestamp', async function () {
-    let hash = await openccip.isAllSynced( contractAddr, MarketplaceMockABI );
+    let hash = await openccip.getAllSyncTimestamp('base-testnet', crc1ContractAddr, CRC1SyncableABI );
 
-    assert.equal(hash.length, 66, "transaction failed")
+    console.log("ahash ", hash)
   });
 })

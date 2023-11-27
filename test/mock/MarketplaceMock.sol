@@ -12,5 +12,9 @@ contract MarketplaceMock{
     function buy(uint256[] memory _bestRoutes, SaleType saleType,  address tokenAddress, uint256 tokenId) public {
         emit Buy(tokenAddress, tokenId);
     }
+    
+    function supportsExtInterface(bytes4 interfaceID) public view virtual returns (bool) {    
+        return interfaceID == 0x00000000;
+    }
 }
 

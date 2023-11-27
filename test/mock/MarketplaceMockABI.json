@@ -54,7 +54,7 @@
 				"type": "bytes4"
 			}
 		],
-		"name": "supportsInterface",
+		"name": "supportsExtInterface",
 		"outputs": [
 			{
 				"internalType": "bool",
