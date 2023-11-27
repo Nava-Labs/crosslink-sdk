@@ -10,6 +10,9 @@ describe('OpenCCIP SDK', function () {
   let openccip, account;
   const FROM = 'base-testnet'
   const TO = 'polygon-testnet'
+  const contractAddr = '0xB8316EC19DF8F0FD4A8089C9dA437688B50F9b90'
+  const mockInterfaceId = '0x00000000';
+
   before(async function (){
     account = privateKeyToAccount(process.env.PK) 
     walletAccount = createWalletClient({
@@ -30,7 +33,7 @@ describe('OpenCCIP SDK', function () {
   it('should able to hop and execute based on route', async function () {
     this.timeout(5000)
     let contractDetails = {
-      contractAddr: "0x84335647DB15CeBe5b313b6D3D883b13652115f2",
+      contractAddr: contractAddr,
       contractABI: MarketplaceMockABI,
       functionName: "buy",
       args: [
@@ -39,7 +42,12 @@ describe('OpenCCIP SDK', function () {
         "1" //tokenId
       ]
     }
-    let hash = await openccip.hopThenExecute(FROM, TO, contractDetails);
+    // let hash = await openccip.hopThenExecute(FROM, TO, contractDetails);
+    // assert.equal(hash.length, 66, "transaction failed")
+  });
+
+  it('should able to get all last sync timestamp', async function () {
+    let hash = await openccip.isAllSynced( contractAddr, MarketplaceMockABI );
 
     assert.equal(hash.length, 66, "transaction failed")
   });

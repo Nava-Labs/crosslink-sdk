@@ -63,8 +63,29 @@ class OpenCCIP {
         } catch (error) {
             throw new Error(`Error sending transaction: ${error.message}`);
         }
+    }
 
+    async supportsCRC1Syncable(contractAddr, contractABI){
+        let res = await this.client.readContract({
+            address: contractAddr,
+            abi: contractABI,
+            functionName: 'supportsExtInterface', //supportsExtInterface
+            args: ['0x00000000']
+        })
+        console.log("ini res ", res);
+        if (!res) throw new Error("The contract is not implement OpenCCIPSyncLayer")
+        return res;
+    }
 
+    async isAllSynced(contractAddr, contractABI){
+        try {
+            await this.isOpenCCIPSyncLayer(contractAddr, contractABI);
+            
+        } catch (error) {
+            throw new Error(`The provided contract is not implement OpenCCIPSyncLayer ${error.message}`);
+        }
+        
+        return hash;
     }
 }
 
