@@ -93,6 +93,7 @@ let contractDetails = {
 const FROM = 'base-testnet';
 const TO = 'polygon-testnet';
 const txHash = await openccip.hopThenExecute(FROM, TO, sourceDetails);
+const bestRoutes = await openccip.fetchBestRoutes(FROM, TO); //if you'd like to know the best routes
 ```
 
 ## Contributing
