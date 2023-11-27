@@ -9,6 +9,7 @@ The OpenCCIP SDK is a powerful tool for developers to implement multichain trans
 - [SDK Functions](#sdk-functions)
   - [1. `hopThenExecute`](#1-hopthenexecute)
   - [2. `fetchBestRoutes`](#2-fetchBestRoutes)
+  - [2. `getAllSyncTimestamps`](#2-getAllSyncTimetamps)
 - [Example](#example)
 - [Contributing](#contributing)
 
@@ -40,12 +41,16 @@ const sourceDetails = {
 };
 ```
 
-
-
 2. fetchBestRoutes(FROM, TO)
 This function retrieves the best possible routes for a transaction.
 ```javascript
 const bestRoutes = await openccip.fetchBestRoutes(FROM, TO);
+```
+
+3. getAllSyncTimestamp(chain, contractAddr, contractABI)
+This function retrieves all the synced timestamps between all smart contracts that implements CRC1Syncable
+```javascript
+const timestamps = await openccip.getAllSyncTimestamp('base-testnet',crc1ContractAddr, CRC1SyncableABI );
 ```
 
 #### Source and Destination Chain Identifiers

@@ -140,34 +140,33 @@ class OpenCCIP {
     this.walletClient = walletClient
   }
 
-  async supportsCRC1Syncable (contractAddr, contractABI) {
-    let rpc = getRPC(chain)
+  async supportsCRC1Syncable (chain, contractAddr, contractABI) {
+    let rpc = this.getRPC(chain)
     let client = createPublicClient({
-        chain: rpc,
-        transport: http()
-      })
+      chain: rpc,
+      transport: http()
+    })
     let res = await client.readContract({
       address: contractAddr,
       abi: contractABI,
       functionName: 'supportsExtInterface', //supportsExtInterface
       args: ['0x44617461']
     })
-    console.log('ini res ', res)
     if (!res) throw new Error('The contract is not implement OpenCCIPSyncLayer')
     return res
   }
 
-  getRPC(chain){
-    return this.CHAIN_METADATA[chain].rpc;
+  getRPC (chain) {
+    return this.CHAIN_METADATA[chain].rpc
   }
 
-  async getAllSyncTimestamp (chain, contractAddr, contractABI) {
+  async getAllSyncTimestamps (chain, contractAddr, contractABI) {
     try {
-        let rpc = getRPC(chain)
-        let client = createPublicClient({
-            chain: rpc,
-            transport: http()
-          })
+      let rpc = this.getRPC(chain)
+      let client = createPublicClient({
+        chain: rpc,
+        transport: http()
+      })
       let useCRC1Syncable = await this.supportsCRC1Syncable(
         chain,
         contractAddr,
@@ -188,8 +187,11 @@ class OpenCCIP {
         let rpc
         let tempMetadata
         for (const chainName in this.CHAIN_METADATA) {
-            const metadata = this.CHAIN_METADATA[chainName];
-          if (trustedSenders[i].chainIdSelector.toString() == metadata.chainSelector) {
+          const metadata = this.CHAIN_METADATA[chainName]
+          if (
+            trustedSenders[i].chainIdSelector.toString() ==
+            metadata.chainSelector
+          ) {
             tempMetadata = metadata
             break
           }
@@ -198,8 +200,8 @@ class OpenCCIP {
           chain: tempMetadata.rpc,
           transport: http()
         })
-        let crossChainAppAddr = trustedSenders[i].crossChainApp;
-        tempMetadata.contractAddr = crossChainAppAddr;
+        let crossChainAppAddr = trustedSenders[i].crossChainApp
+        tempMetadata.contractAddr = crossChainAppAddr
         let contractCall = publicClient.readContract({
           address: crossChainAppAddr,
           abi: contractABI,
@@ -212,7 +214,7 @@ class OpenCCIP {
       for (let i = 0; i < data.length; i++) {
         latestSyncTimestamps[i].latestSyncTimestamp = data[i]
       }
-      return latestSyncTimestamps;
+      return latestSyncTimestamps
     } catch (error) {
       throw new Error(
         `The provided contract is not extending CRC1 Syncable ${error.message}`

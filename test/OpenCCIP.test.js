@@ -34,7 +34,6 @@ describe('OpenCCIP SDK', function () {
 
   it('should able to get all supported networks', async function () {
     let supportedNetworks = openccip.getSupportedNetworks();
-    console.log("supproted ", supportedNetworks)
     assert.deepEqual(supportedNetworks, SUPPORTED_NETWORKS, "the supported network is not correct")
   });
   
@@ -62,7 +61,7 @@ describe('OpenCCIP SDK', function () {
   });
 
   it('should able to get all last sync timestamp', async function () {
-    let hash = await openccip.getAllSyncTimestamp('base-testnet', crc1ContractAddr, CRC1SyncableABI );
+    let hash = await openccip.getAllSyncTimestamps('base-testnet', crc1ContractAddr, CRC1SyncableABI );
 
     console.log("ahash ", hash)
   });
