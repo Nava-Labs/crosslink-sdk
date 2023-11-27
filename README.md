@@ -31,7 +31,7 @@ This function allows you to perform a multichain transaction with multihop featu
   - `source`: The source chain identifier. It can be one of the following: 'op-testnet', 'polygon-testnet', 'base-testnet', or 'bsc-testnet'.
   - `destination`: The destination chain identifier. It can be one of the following: 'op-testnet', 'polygon-testnet', 'base-testnet', or 'bsc-testnet'.
   - `sourceDetails`: An object containing details about the transaction on the source chain. It should have the following structure:
-```
+```javascript
 const sourceDetails = {
   contractAddr: contractAddr,
   contractABI: contractABI,
@@ -44,7 +44,7 @@ const sourceDetails = {
 
 2. fetchBestRoutes(FROM, TO)
 This function retrieves the best possible routes for a transaction.
-```
+```javascript
 const bestRoutes = await openccip.fetchBestRoutes(FROM, TO);
 ```
 
@@ -62,7 +62,7 @@ The source and destination variables are used to specify the source and destinat
 ### Example
 Follow this example to use the SDK
 
-```
+```javascript
 const OpenCCIP = require('openccip-sdk');
 const { createWalletClient, http } = require('viem');
 const { privateKeyToAccount } = require('viem/accounts');
