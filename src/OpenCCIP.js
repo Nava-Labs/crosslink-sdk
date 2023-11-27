@@ -141,7 +141,12 @@ class OpenCCIP {
   }
 
   async supportsCRC1Syncable (contractAddr, contractABI) {
-    let res = await this.client.readContract({
+    let rpc = getRPC(chain)
+    let client = createPublicClient({
+        chain: rpc,
+        transport: http()
+      })
+    let res = await client.readContract({
       address: contractAddr,
       abi: contractABI,
       functionName: 'supportsExtInterface', //supportsExtInterface
@@ -152,16 +157,26 @@ class OpenCCIP {
     return res
   }
 
+  getRPC(chain){
+    return this.CHAIN_METADATA[chain].rpc;
+  }
+
   async getAllSyncTimestamp (chain, contractAddr, contractABI) {
     try {
+        let rpc = getRPC(chain)
+        let client = createPublicClient({
+            chain: rpc,
+            transport: http()
+          })
       let useCRC1Syncable = await this.supportsCRC1Syncable(
+        chain,
         contractAddr,
         contractABI
       )
       if (!useCRC1Syncable) {
         throw new Error(`the contract is not implement CRC1 Syncable`)
       }
-      let trustedSenders = await this.client.readContract({
+      let trustedSenders = await client.readContract({
         address: contractAddr,
         abi: contractABI,
         functionName: 'getAllNetworksConfig', //supportsExtInterface
