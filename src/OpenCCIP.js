@@ -6,25 +6,26 @@ const {
   sepolia,
   baseGoerli,
   optimismGoerli,
+  optimismSepolia,
   bscTestnet
 } = require('viem/chains')
 const axios = require('axios').default
 
 class OpenCCIP {
   SUPPORTED_NETWORKS = [
-    'op-testnet',
+    // 'op-testnet',
     'fuji-testnet',
     'polygon-testnet',
     'base-testnet',
     'bsc-testnet'
   ]
   CHAIN_METADATA = {
-    'op-testnet': {
-      name: 'OP Testnet',
-      rpc: optimismGoerli,
-      routerAddr: '0xEB52E9Ae4A9Fb37172978642d4C141ef53876f26',
-      chainSelector: '2664363617261496610'
-    },
+    // 'op-testnet': {
+    //   name: 'OP Testnet',
+    //   rpc: optimismGoerli,
+    //   routerAddr: '0xEB52E9Ae4A9Fb37172978642d4C141ef53876f26',
+    //   chainSelector: '2664363617261496610'
+    // },
     'fuji-testnet': {
       name: 'Fuji Testnet',
       rpc: avalancheFuji,
@@ -142,6 +143,7 @@ class OpenCCIP {
 
   async supportsCRC1Syncable (chain, contractAddr, contractABI) {
     let rpc = this.getRPC(chain)
+    // console.log("this is the rpc ", rpc);
     let client = createPublicClient({
       chain: rpc,
       transport: http()
@@ -152,7 +154,7 @@ class OpenCCIP {
       functionName: 'supportsExtInterface', //supportsExtInterface
       args: ['0x44617461']
     })
-    if (!res) throw new Error('The contract is not implement OpenCCIPSyncLayer')
+    if (!res) throw new Error('The contract is not implement CRC1Syncable')
     return res
   }
 
@@ -163,6 +165,8 @@ class OpenCCIP {
   async getAllSyncTimestamps (chain, contractAddr, contractABI) {
     try {
       let rpc = this.getRPC(chain)
+    //   console.log("check get all synctimestamp ", chain, contractAddr)
+    //   console.log("this is the rpc  ", rpc)
       let client = createPublicClient({
         chain: rpc,
         transport: http()
@@ -172,34 +176,39 @@ class OpenCCIP {
         contractAddr,
         contractABI
       )
-      if (!useCRC1Syncable) {
+      if (!useCRC1Syncable) { //check if the CRC1Syncable
         throw new Error(`the contract is not implement CRC1 Syncable`)
       }
-      let trustedSenders = await client.readContract({
+      let trustedSenders = await client.readContract({ //get all trusted senders
         address: contractAddr,
         abi: contractABI,
-        functionName: 'getAllNetworksConfig', //supportsExtInterface
+        functionName: 'getAllNetworksConfig',
         args: []
       })
       let promises = []
       let latestSyncTimestamps = []
+
       for (let i = 0; i < trustedSenders.length; i++) {
-        let rpc
+        let found = false;
         let tempMetadata
-        for (const chainName in this.CHAIN_METADATA) {
+        for (const chainName in this.CHAIN_METADATA) { //check the trusted sender with current chain metadata
           const metadata = this.CHAIN_METADATA[chainName]
           if (
             trustedSenders[i].chainIdSelector.toString() ==
-            metadata.chainSelector
-          ) {
+            metadata.chainSelector 
+          ) { //if we detect the metadata, save it
             tempMetadata = metadata
+            found = true;
             break
           }
         }
-        let publicClient = createPublicClient({
+        if (found == false ) continue; //the blockchain is not supported yet. Probably op due to lack of good rpcs
+
+        let publicClient = createPublicClient({ //create public client based on the rpc
           chain: tempMetadata.rpc,
           transport: http()
         })
+        // console.log("this is temp metadata ", tempMetadata)
         let crossChainAppAddr = trustedSenders[i].crossChainApp
         tempMetadata.contractAddr = crossChainAppAddr
         let contractCall = publicClient.readContract({
@@ -207,6 +216,7 @@ class OpenCCIP {
           abi: contractABI,
           functionName: 'latestSyncTimestamp'
         })
+        // console.log("now its calling latestSyncTimestamp", crossChainAppAddr, " with rpc " , tempMetadata.rpc)
         promises.push(contractCall)
         latestSyncTimestamps.push(tempMetadata)
       }
@@ -214,6 +224,7 @@ class OpenCCIP {
       for (let i = 0; i < data.length; i++) {
         latestSyncTimestamps[i].latestSyncTimestamp = data[i]
       }
+    //   console.log("latest sync timestamps ", latestSyncTimestamps)
       return latestSyncTimestamps
     } catch (error) {
       throw new Error(
