@@ -24,43 +24,50 @@ class OpenCCIP {
     //   name: 'OP Testnet',
     //   rpc: optimismGoerli,
     //   routerAddr: '0xEB52E9Ae4A9Fb37172978642d4C141ef53876f26',
-    //   chainSelector: '2664363617261496610'
+    //   chainSelector: '2664363617261496610',
+    //   transport: http("https://optimism-goerli.blockpi.network/v1/rpc/public")
     // },
     'fuji-testnet': {
       name: 'Fuji Testnet',
       rpc: avalancheFuji,
       routerAddr: '0x554472a2720E5E7D5D3C817529aBA05EEd5F82D8',
-      chainSelector: '14767482510784806043'
+      chainSelector: '14767482510784806043',
+      transport: http()
     },
     'sepolia-testnet': {
       name: 'Sepolia Testnet',
       rpc: sepolia,
       routerAddr: '0xD0daae2231E9CB96b94C8512223533293C3693Bf',
-      chainSelector: '16015286601757825753'
+      chainSelector: '16015286601757825753',
+      transport: http()
     },
     'polygon-testnet': {
       name: 'Polygon Testnet',
       rpc: polygonMumbai,
       routerAddr: '0x70499c328e1E2a3c41108bd3730F6670a44595D1',
-      chainSelector: '12532609583862916517'
+      chainSelector: '12532609583862916517',
+      transport: http()
     },
     'arbitrum-testnet': {
       name: 'Arbitrum Testnet',
       rpc: arbitrumGoerli,
       routerAddr: '0x88E492127709447A5ABEFdaB8788a15B4567589E',
-      chainSelector: '6101244977088475029'
+      chainSelector: '6101244977088475029',
+      transport: http()
     },
     'base-testnet': {
       name: 'Base Testnet',
       rpc: baseGoerli,
       routerAddr: '0xa8c0c11bf64af62cdca6f93d3769b88bdd7cb93d',
-      chainSelector: '5790810961207155433'
+      chainSelector: '5790810961207155433',
+      transport: http()
     },
     'bsc-testnet': {
       name: 'BSC Testnet',
       rpc: bscTestnet,
       routerAddr: '0x9527e2d01a3064ef6b50c1da1c0cc523803bcff2',
-      chainSelector: '13264668187771770619'
+      chainSelector: '13264668187771770619',
+      transport: http("https://bsc-testnet.blockpi.network/v1/rpc/public")
     }
   }
 
@@ -159,7 +166,11 @@ class OpenCCIP {
   }
 
   getRPC (chain) {
-    return this.CHAIN_METADATA[chain].rpc
+    try{
+        return this.CHAIN_METADATA[chain].rpc
+    }catch(err){
+        throw new Error("the chain is not supported.", err)
+    }
   }
 
   async getAllSyncTimestamps (chain, contractAddr, contractABI) {
@@ -206,7 +217,7 @@ class OpenCCIP {
 
         let publicClient = createPublicClient({ //create public client based on the rpc
           chain: tempMetadata.rpc,
-          transport: http()
+          transport: tempMetadata.transport
         })
         // console.log("this is temp metadata ", tempMetadata)
         let crossChainAppAddr = trustedSenders[i].crossChainApp
@@ -228,7 +239,7 @@ class OpenCCIP {
       return latestSyncTimestamps
     } catch (error) {
       throw new Error(
-        `The provided contract is not extending CRC1 Syncable ${error.message}`
+        `Error: ${error.message}`
       )
     }
   }
