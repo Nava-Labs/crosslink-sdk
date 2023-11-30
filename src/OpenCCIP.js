@@ -17,7 +17,7 @@ class OpenCCIP {
     'fuji-testnet',
     'polygon-testnet',
     'base-testnet',
-    'bsc-testnet'
+    // 'bsc-testnet'
   ]
   CHAIN_METADATA = {
     // 'op-testnet': {
@@ -62,13 +62,13 @@ class OpenCCIP {
       chainSelector: '5790810961207155433',
       transport: http()
     },
-    'bsc-testnet': {
-      name: 'BSC Testnet',
-      rpc: bscTestnet,
-      routerAddr: '0x9527e2d01a3064ef6b50c1da1c0cc523803bcff2',
-      chainSelector: '13264668187771770619',
-      transport: http("https://bsc-testnet.blockpi.network/v1/rpc/public")
-    }
+    // 'bsc-testnet': {
+    //   name: 'BSC Testnet',
+    //   rpc: bscTestnet,
+    //   routerAddr: '0x9527e2d01a3064ef6b50c1da1c0cc523803bcff2',
+    //   chainSelector: '13264668187771770619',
+    //   transport: http("https://bsc-testnet.public.blastapi.io")
+    // }
   }
 
   constructor (walletClient) {
@@ -77,10 +77,7 @@ class OpenCCIP {
       chain: baseGoerli,
       transport: http()
     })
-    // this.crossLinkBaseAPI = "https://crosslink-dev-app.vercel.app"
     this.openCCIPBaseAPI = 'https://openccip-app.vercel.app'
-    // this.crossLinkBaseAPI = "https://crosslink-app-git-feat-best-routes-nava-labs.vercel.app"
-    // this.crossLinkBaseAPI = "https://crosslink-app-git-feat-best-routes-nava-labs.vercel.app/api/best-routes?_vercel_share=UOM7qyACZQxA3OjHeIGi5ODFrsI1kJ1x"
   }
 
   async fetchBestRoutes (source, destination) {
@@ -150,7 +147,6 @@ class OpenCCIP {
 
   async supportsCRC1Syncable (chain, contractAddr, contractABI) {
     let rpc = this.getRPC(chain)
-    // console.log("this is the rpc ", rpc);
     let client = createPublicClient({
       chain: rpc,
       transport: http()
@@ -176,8 +172,6 @@ class OpenCCIP {
   async getAllSyncTimestamps (chain, contractAddr, contractABI) {
     try {
       let rpc = this.getRPC(chain)
-    //   console.log("check get all synctimestamp ", chain, contractAddr)
-    //   console.log("this is the rpc  ", rpc)
       let client = createPublicClient({
         chain: rpc,
         transport: http()
@@ -219,7 +213,6 @@ class OpenCCIP {
           chain: tempMetadata.rpc,
           transport: tempMetadata.transport
         })
-        // console.log("this is temp metadata ", tempMetadata)
         let crossChainAppAddr = trustedSenders[i].crossChainApp
         tempMetadata.contractAddr = crossChainAppAddr
         let contractCall = publicClient.readContract({
@@ -227,7 +220,6 @@ class OpenCCIP {
           abi: contractABI,
           functionName: 'latestSyncTimestamp'
         })
-        // console.log("now its calling latestSyncTimestamp", crossChainAppAddr, " with rpc " , tempMetadata.rpc)
         promises.push(contractCall)
         latestSyncTimestamps.push(tempMetadata)
       }
@@ -235,7 +227,6 @@ class OpenCCIP {
       for (let i = 0; i < data.length; i++) {
         latestSyncTimestamps[i].latestSyncTimestamp = data[i]
       }
-    //   console.log("latest sync timestamps ", latestSyncTimestamps)
       return latestSyncTimestamps
     } catch (error) {
       throw new Error(

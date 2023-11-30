@@ -1,12 +1,11 @@
 # OpenCCIP SDK README
 
-The OpenCCIP SDK is a powerful tool for developers to implement multichain transactions with multihop features supported by Chainlink CCIP. It is also compatible with Viem Wallet.
+The OpenCCIP SDK serves as a SDK for developers seeking to integrate with CRC1, CRC1Syncable, CRC20 and Fee Automation in [OpenCCIP Contract](https://github.com/Nava-Labs/openccip-contracts/tree/main#crc1--crc20). It integrates with Viem Wallet, ensuring a smooth and cohesive dev experience in managing wallets.
 
 ## Table of Contents
 
 - [Installation](#installation)
-- [Getting Started](#getting-started)
-- [SDK Functions](#sdk-functions)
+- [Functions](#functions)
   - [1. `hopThenExecute`](#1-hopthenexecute)
   - [2. `fetchBestRoutes`](#2-fetchBestRoutes)
   - [3. `getAllSyncTimestamps`](#3-getAllSyncTimetamps)
@@ -27,45 +26,48 @@ or
 `
 
 ### Functions
-1. hopThenExecute(source, destination, sourceDetails)
-This function allows you to perform a multichain transaction with multihop features. It returns a transaction hash upon success.
-  - `source`: The source chain identifier. It can be one of the following: 'op-testnet', 'polygon-testnet', 'base-testnet', or 'bsc-testnet'.
-  - `destination`: The destination chain identifier. It can be one of the following: 'op-testnet', 'polygon-testnet', 'base-testnet', or 'bsc-testnet'.
+1. ```hopThenExecute(source, destination, sourceDetails)```
+This function allows you to perform a multichain transaction with multihop features. Under the hood, it'll fetch the best routes and simulate the transaction to ensure the best user and developer experience. It returns a transaction hash upon success.
+  - `source`: The source chain identifier. See the [supported network](#supported-networks)
+  - `destination`: The destination chain identifier. See the [supported network](#supported-networks)
   - `sourceDetails`: An object containing details about the transaction on the source chain. It should have the following structure:
 ```javascript
 const sourceDetails = {
   contractAddr: contractAddr,
   contractABI: contractABI,
   functionName: functionName,
-  args: [] // arguments/parameters will pass to the destination contract
+  args: []
 };
 ```
 
 2. fetchBestRoutes(FROM, TO)
-This function retrieves the best possible routes for a transaction.
+This function retrieves the best possible routes to execute multichain transactions via Chainlink CCIP. See 
 ```javascript
 const bestRoutes = await openccip.fetchBestRoutes(FROM, TO);
 ```
 
 3. getAllSyncTimestamp(chain, contractAddr, contractABI)
-This function retrieves all the synced timestamps between all smart contracts that implements CRC1Syncable
+This function retrieves all the synced timestamps between all smart contracts that **implements CRC1Syncable**
 ```javascript
-const timestamps = await openccip.getAllSyncTimestamp('base-testnet',crc1ContractAddr, CRC1SyncableABI );
+const timestamps = await openccip.getAllSyncTimestamp('base-testnet',crc1SyncableAddr, CRC1SyncableABI );
 ```
 
-#### Source and Destination Chain Identifiers
-The source and destination variables are used to specify the source and destination chain identifiers for multichain transactions. These identifiers determine the blockchain networks involved in the transaction. Here are the valid options for these variables:
+## Supported Networks
+The source and destination variables are used to specify the `source` and `destination` chain identifiers for multichain transactions. These identifiers determine the blockchain networks involved in the transaction. Here are the valid options for these variables:
 
-- `op-testnet`: This represents the Opera Testnet blockchain network.
-- `fuji-testnet`: This represents the Polygon Testnet blockchain network.
+- `op-testnet`: This represents the Optimism Testnet blockchain network.
+- `fuji-testnet`: This represents the Avalanche Fuji Testnet blockchain network.
 - `polygon-testnet`: This represents the Polygon Testnet blockchain network.
 - `base-testnet`: This represents Base testnet blockchain network 
-- `bsc-testnet`: This represents the Binance Smart Chain Testnet blockchain network
+- `bsc-testnet`: This represents the Binance Smart Chain Testnet blockchain network. *NOT RECOMENDED DUE TO LACK OF GOOD RPC*
+
+### How to find the best routes
+Following the principle of Dijkstra's Shortest Path Algorithm, we assigned "weight" to each possible direct lane supported by CCIP which is calculated based on each blockchain Time-To-Finality, 5-day average gas price, and Transaction per Second.
+With the assigned "weight", the best route can be found. To make things easy from the front end, we build this into an SDK, so the front end only needs to pass the "from" and "to" chains. The SDK will find the best possible routes, which then will be passed to the smart contract for the cross-chain transaction to be executed.
 
 
-
-### Example
-Follow this example to use the SDK
+## Example
+Follow this example to use the SDK. You'll need to deploy either CRC1, CRC1Syncable, or CRC20 smart contracts. See the smart contract examples [here](https://github.com/Nava-Labs/openccip-contracts/tree/main/src/examples)
 
 ```javascript
 const OpenCCIP = require('openccip-sdk');
@@ -75,7 +77,7 @@ const { baseGoerli } = require('viem/chains');
 
 const account = privateKeyToAccount(process.env.PK); // Replace with your private key
 const walletAccount = createWalletClient({
-  chain: baseGoerli, // Replace with your desired chain configuration
+  chain: baseGoerli, // Replace with your desired source chain configuration
   account,
   transport: http(),
 });
@@ -94,6 +96,7 @@ const FROM = 'base-testnet';
 const TO = 'polygon-testnet';
 const txHash = await openccip.hopThenExecute(FROM, TO, sourceDetails);
 const bestRoutes = await openccip.fetchBestRoutes(FROM, TO); //if you'd like to know the best routes
+let timestamps = await openccip.getAllSyncTimestamps('polygon-testnet', crc1SyncableAddr, CRC1SyncableABI ); // make sure it is a Syncable contract
 ```
 
 ## Contributing

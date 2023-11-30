@@ -12,7 +12,7 @@ describe('OpenCCIP SDK', function () {
   const FROM = 'base-testnet'
   const TO = 'polygon-testnet'
   const mockContractAddr = '0x27bB6AA05244730B1CA31Fe71C1616A68b60A9B3'
-  const crc1ContractAddr = '0xf3cef7fA414CB9a027f73a4d46f02092C5412862'
+  const crc1ContractAddr = '0x3b8a9c94c406f08Be7997136dF273FE652bc3612'
   const mockInterfaceId = '0x00000000';
 
   const SUPPORTED_NETWORKS = [
@@ -20,7 +20,7 @@ describe('OpenCCIP SDK', function () {
     'fuji-testnet',
     'polygon-testnet',
     'base-testnet',
-    'bsc-testnet'
+    // 'bsc-testnet'
   ]
   before(async function (){
     account = privateKeyToAccount(process.env.PK) 
@@ -47,7 +47,7 @@ describe('OpenCCIP SDK', function () {
   it('should able to hop and execute based on route', async function () {
     this.timeout(5000)
     let contractDetails = {
-      mockContractAddr: mockContractAddr,
+      contractAddr: mockContractAddr,
       contractABI: MarketplaceMockABI,
       functionName: "buy",
       args: [
@@ -56,13 +56,12 @@ describe('OpenCCIP SDK', function () {
         "1" //tokenId
       ]
     }
-    // let hash = await openccip.hopThenExecute(FROM, TO, contractDetails);
-    // assert.equal(hash.length, 66, "transaction failed")
+    let hash = await openccip.hopThenExecute(FROM, TO, contractDetails);
+    assert.equal(hash.length, 66, "transaction failed")
   });
 
   it('should able to get all last sync timestamp', async function () {
-    let hash = await openccip.getAllSyncTimestamps('bsc-testnet', crc1ContractAddr, CRC1SyncableABI );
-
-    console.log("ahash ", hash)
+    let timestamps = await openccip.getAllSyncTimestamps('polygon-testnet', crc1ContractAddr, CRC1SyncableABI );
+    console.log("ahash ", timestamps)
   });
 })
