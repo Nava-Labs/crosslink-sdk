@@ -55,6 +55,7 @@ const timestamps = await openccip.getAllSyncTimestamp('base-testnet',crc1Syncabl
 ## Supported Networks
 The source and destination variables are used to specify the `source` and `destination` chain identifiers for multichain transactions. These identifiers determine the blockchain networks involved in the transaction. Here are the valid options for these variables:
 
+- `sepolia-testnet`: This represents the Ethereum Sepolia Testnet blockchain network.
 - `op-testnet`: This represents the Optimism Testnet blockchain network.
 - `fuji-testnet`: This represents the Avalanche Fuji Testnet blockchain network.
 - `polygon-testnet`: This represents the Polygon Testnet blockchain network.
